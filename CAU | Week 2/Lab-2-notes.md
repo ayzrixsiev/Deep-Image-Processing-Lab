@@ -1,0 +1,2 @@
+# Subtracting and Adding number to an image
+This is a function to increase or decrease brightness of the image. This is a part of data augmentation, when we prepare data for ML models. When we add a value to the image, all the rgb values becomes closer to the 255, which makes the image brigther, when we subtract we approach 0 which makes the image darker. We can also multiply the image ny a factor, if it is greater than 1, we amke it brighter and less than 1 we make it darker, same rule applies to the division.
