@@ -8,3 +8,12 @@ These are pixel level operations that uses Masks to target a specific part of an
 | **OR** | `Either can be white` | Both shapes are combined into one large white area. |
 | **XOR** | `Only one is white` | Keeps both shapes, but the area where they overlap turns **black**. |
 | **NOT** | `Invert` | Turns the white square into a black square with a white background. |
+
+
+alpha: contrast factor; values > 1 increase contrast, values < 1 decrease contrast.
+
+beta: brightness offset; adding a positive number brightens the image, while a negative number darkens it.
+
+cv2.convertScaleAbs(): applies the linear transformation
+
+Formula to apply linear transformation: new_image = alpha*image + beta
