@@ -17,3 +17,13 @@ beta: brightness offset; adding a positive number brightens the image, while a n
 cv2.convertScaleAbs(): applies the linear transformation
 
 Formula to apply linear transformation: new_image = alpha*image + beta
+
+# Gamma correction for brightening and contrast
+More natural way of changing brightness and contrast of an image. We gamma < 1, mid tones become darker, when gamma > 1, mid tones become brigther, when gamma = 0, no chnages.
+
+
+The formula is a Power Law:
+$$O = \left( \frac{I}{255} \right)^\gamma \times 255$$
+Normalize: Divide the pixel value ($I$) by 255 to get a range from 0 to 1.
+The Curve: Raise that number to the power of $\gamma$.
+Denormalize: Multiply back by 255 to get your final pixel ($O$).
