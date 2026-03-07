@@ -15,12 +15,15 @@ Formula for tresholding:
 
 (x, y) are the grayscale pixel value on axis plane and depending on the condition it is going to be converted into 1 (ROI) or 0.
 
-# Tresholding types
+# Tresholding types, their pros and cons
 
-Global tresholding: When we are using one value for all the pixels on the image, fast and simple and usually for predictive (documents, images with uniform lightning) data without illuminations.
+**Global tresholding**    
+What it is: Global tresholding takes one number and applies to all pixels, perfect for images with uniform lighting, e.g. document. But it's downside is when image has e.g. slightly dark corner it will make it completly black even if there was a detail that we might be interested in.
 
-Adaptive tresholding: When we use different treshold values on different image areas. We use neighborhood statistics (mean or Gaussian-weighted average). We use it for uneven lighting conditions, medical images, real world surveillance images. The formula is the following:
+**Adaptive tresholding**     
+What it is: Instead of one treshold for the whole image, computer devides image into neighborhoods (blocks) and calculates a different treshold value for each of them. Best for images with uneven lighting. But it may falls short in areas where there is no really ROI object but it is still going to try to find it and make it white because of noise.
 
-T(local for the certain area) = Mean of Neighborhood(simple mean or Gaussian-weighted mean) - C(constant value, the higher it is the more pixels become black, the smaller it is the smaller it becomes).
+        T(local for the certain area) = Mean of Neighborhood(simple mean or Gaussian-weighted mean) - C(constant value, the higher it is the more pixels become black, the smaller it is the smaller it becomes).
 
-Otsu's tresholding: Treshold selected automatically by doing math. Good for medical data - finding an organ.
+**Otsu's tresholding:**
+What it is: It is also uses one global value for each pixel but calculates it based on the image's histogram (two mountains. dark and black). Best for bimodal images (those which have clear distinction between foreground and background). Donwside is same as in global tresholding, it may fail if light and dark varies too much.  
