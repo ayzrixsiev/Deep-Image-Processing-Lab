@@ -27,3 +27,10 @@ What it is: Instead of one treshold for the whole image, computer devides image 
 
 **Otsu's tresholding:**
 What it is: It is also uses one global value for each pixel but calculates it based on the image's histogram (two mountains. dark and black). Best for bimodal images (those which have clear distinction between foreground and background). Donwside is same as in global tresholding, it may fail if light and dark varies too much.  
+
+
+# Gamma correction
+This is a technique to adjust the brightness of an image. Gamma < 1.0 makes image brighter, gamma > 1.0 make image darker.
+
+# Contrast Stretching
+This is a technique used to expand the range of intensity levels in image. If an image only uses a narrow range of colors (e.g., all pixels are between 50 and 150), it will look dull or "foggy." It maps the lowest pixel value in your image to 0 (black) and the highest pixel value to 255 (white), stretching everything in between to fill the available space .
