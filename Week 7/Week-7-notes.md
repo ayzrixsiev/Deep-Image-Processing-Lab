@@ -1,1 +1,2 @@
 # Edge detection
+An edge is a location in an image where there is a sudden, sharp change in intensity (brightness). It is the boundary between two distinct objects or between an object and the background.
