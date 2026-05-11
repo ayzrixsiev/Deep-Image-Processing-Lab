@@ -76,3 +76,26 @@ To solve this problem, best option is median filter. First of all those big numb
 
 When you apply a massive Gaussian Filter (like 101x101):
 You are telling the computer to blur everything so much that the "mountains" (the objects/details) disappear, leaving only the "giant hill" (the lighting pattern). After that we resulted image and subtract it from original one.
+
+## Sharpening Filters
+
+### High pass filters vs Low Pass filters
+
+We have two main brightness domains in the images:      
+Low frequencies - when brightness changes slowly (like in large objects)        
+High frequencies - when brightness changes fast (lines, new objects)        
+
+**Low pass filter** - helps us smooth those fast fast changing brightness parts, creating a blur effect. (deals with high frequencies)      
+**High pass filters** - helps us makes keep fast changing details, and get rid off "slow" parts to sharpen the image. (deals with low frequencies)      
+
+
+### First-Order Derivatives
+
+A derivative measures the rate of change of intensity. Formula: f'(x) = f(x+1) - f(x)       
+Example:        
+Intensity profile: [ 100  100  100  150  200  200  200 ]        
+First derivative:  [   0    0   50   50    0    0      ]    
+
+Why First Derivatives Give Thick Edges? If we take an example of this edge: [ 50  50  60  80  120  160  180  190  200  200 ]
+
+The intensity changes slowly. But deravitive can calculate only the change of two pixels at a time, meaning how much current pixel changed from previous one? Hence each check it marks a change as a new edge, as a result we get thick line.
