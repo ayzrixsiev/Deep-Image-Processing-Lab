@@ -82,20 +82,42 @@ You are telling the computer to blur everything so much that the "mountains" (th
 ### High pass filters vs Low Pass filters
 
 We have two main brightness domains in the images:      
-Low frequencies - when brightness changes slowly (like in large objects)        
-High frequencies - when brightness changes fast (lines, new objects)        
+Low frequencies - when brightness changes slowly (like in large objects).        
+High frequencies - when brightness changes fast (lines, new objects).        
 
-**Low pass filter** - helps us smooth those fast fast changing brightness parts, creating a blur effect. (deals with high frequencies)      
-**High pass filters** - helps us makes keep fast changing details, and get rid off "slow" parts to sharpen the image. (deals with low frequencies)      
+**Low pass filter** - helps us smooth those fast fast changing brightness parts, creating a blur effect. (deals with high frequencies).      
+**High pass filters** - helps us makes keep fast changing details, and get rid off "slow" parts to sharpen the image. (deals with low frequencies).      
 
 
-### First-Order Derivatives
+### First-Order Derivatives (Sobel)
 
-A derivative measures the rate of change of intensity. Formula: f'(x) = f(x+1) - f(x)       
+**Derivative** measures the rate of change of intensity. Formula: f'(x) = f(x+1) - f(x).         
 Example:        
 Intensity profile: [ 100  100  100  150  200  200  200 ]        
 First derivative:  [   0    0   50   50    0    0      ]    
 
-Why First Derivatives Give Thick Edges? If we take an example of this edge: [ 50  50  60  80  120  160  180  190  200  200 ]
+Why First Derivatives Give Thick Edges? If we take an example of this edge: [ 50  50  60  80  120  160  180  190  200  200 ].
 
 The intensity changes slowly. But deravitive can calculate only the change of two pixels at a time, meaning how much current pixel changed from previous one? Hence each check it marks a change as a new edge, as a result we get thick line.
+
+### First-Order Gradient Operators
+
+**Roberts Cross Operator**      
+Gx = [ 1   0 ]      Gy = [ 0   1 ]      
+     [ 0  -1 ]           [-1   0 ]      
+
+To detect diagonal edges, very sensitive to noise.       
+
+**Sobel operator**      
+
+Gx = [-1  0  1 ]      Gy = [-1 -2 -1 ]      
+     [-2  0  2 ]           [ 0  0  0 ]      
+     [-1  0  1 ]           [ 1  2  1 ]      
+
+To detect horizontal and vertical edges, has it's own smoothing effect (look at 1, 2, 1). good for noisy images.     
+
+###  Second-Order Derivatives (Laplacian)
+
+Formula: f''(x) = f(x+1) + f(x-1) - 2×f(x)
+
+This gives us more precise deravitive localization. Because of the concept named: Zero crossing, which means 
