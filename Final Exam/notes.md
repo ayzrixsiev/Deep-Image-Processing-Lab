@@ -4,7 +4,7 @@
 It is a technique of sliding window (mask) over the image, computing new center value based on it's neighbors.
 
 ### Box filtering       
-It is one of the implementations of this technique, we change each pixel by computing average of all the pixels. We must normilize this filter in order to avoid sum > 1, which will make image too bright or sum < 1 which makes image too dark. If we make value. 
+It is one of the implementations of this technique, we change each pixel by computing average of all the pixels. We must normilize this filter in order to avoid sum > 1, which will make image too bright or sum < 1 which makes image too dark. If we make value sum = 1, we are good. 
 
 Example image:      
 [ 10  20  30  40  50 ]      
@@ -32,7 +32,7 @@ Instead of giving equal weight to all neigbors like box filter (kernel consists 
 
 **Circular Symmetry** this means the filter treats equally all pixels regardless direction. Box does not follow the rule, while gaussian does.
 
-**Padding methods**, when we reach borders of images with kernel, some of our neighbots will be outside of the box, we need to decide what to do with them.
+**Padding methods**, when we reach borders of images with kernel, some of our neighbors will be outside of the box, we need to decide what to do with them.
 
     1. Zero padding. When we add zeroes to the borders.
     Original:  [ 100  120  140 ]
@@ -86,7 +86,7 @@ Low frequencies - when brightness changes slowly (like in large objects).
 High frequencies - when brightness changes fast (lines, new objects).        
 
 **Low pass filter** - helps us smooth those fast fast changing brightness parts, creating a blur effect. (deals with high frequencies).      
-**High pass filters** - helps us makes keep fast changing details, and get rid off "slow" parts to sharpen the image. (deals with low frequencies).      
+**High pass filters** - keep fast changing details, and get rid off "slow" parts to sharpen the image. (deals with low frequencies).      
 
 
 ### First-Order Derivatives (Sobel)
@@ -103,8 +103,11 @@ The intensity changes slowly. But deravitive can calculate only the change of tw
 ### First-Order Gradient Operators
 
 **Roberts Cross Operator**      
-Gx = [ 1   0 ]      Gy = [ 0   1 ]      
-     [ 0  -1 ]           [-1   0 ]      
+Gx = [ 1   0 ]                
+     [ 0  -1 ]          
+
+Gy = [ 0   1 ]      
+     [-1   0 ]      
 
 To detect diagonal edges, very sensitive to noise.       
 
@@ -120,4 +123,37 @@ To detect horizontal and vertical edges, has it's own smoothing effect (look at 
 
 Formula: f''(x) = f(x+1) + f(x-1) - 2×f(x)
 
-This gives us more precise deravitive localization. Because of the concept named: Zero crossing, which means 
+This gives us more precise deravitive localization. Because of the concept named: Zero crossing, which means we can find a center of the edge creating a precise location. We use the concept of - and +.
+
+**Laplacian** this is a technique where we extract edges using second deravitive. Here is the example:        
+
+[ 100  100  100 ]        
+[ 100  150  100 ]  ← Edge pixel         
+[ 100  100  100 ]        
+
+150 is a spike in the image.       
+
+Multiply neighbors: 100 * 8 = 800 (get the sum of all neighbors)      
+Multiply center: 150 * (-8) = -1200          
+Sum them up: 800 + (-1200) = -400       
+
+The normal laplacian kernel looks the following way:        
+
+[1 1 1]        
+[1 -8 1]       
+[1 1 1]        
+
+Second deravitive is much sensitive to the noise since it amplifies the noise. For example:
+
+Clean signal:     [ 100  100  100  100 ]               
+Noisy signal:     [ 100   95  105  100 ]               
+
+First derivative:  [ -5   10   -5      ]          
+Second derivative: [ 15  -15   5       ]  ← Larger amplification!
+
+
+Solution: Smooth Before Sharpening      
+
+Apply Gaussian smoothing to reduce noise          
+Then apply Laplacian or other sharpening          
+This reduces false edge detections      
