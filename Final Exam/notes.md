@@ -77,7 +77,7 @@ To solve this problem, best option is median filter. First of all those big numb
 When you apply a massive Gaussian Filter (like 101x101):
 You are telling the computer to blur everything so much that the "mountains" (the objects/details) disappear, leaving only the "giant hill" (the lighting pattern). After that we resulted image and subtract it from original one.
 
-## Sharpening Filters
+# 2. Spatial Filtering - Sharpening Filters
 
 ### High pass filters vs Low Pass filters
 
@@ -191,7 +191,7 @@ It amplifies high freq details. Which then results in a sharper overall image, a
      [  2  -1  -1 ]      
 
 
-# Summary
+# Summary of Chapters 1 and 2
 
 **We have several processes that we can do over the image**           
 **1. Smoothing image, preprocessing**             
@@ -255,3 +255,32 @@ We are summing all teh neighbor pixels and then subtracting it from the center t
 
 *Unsharp masking* is another approach to extract edges and details. First we blur the image (with gaussian) and leave it only with low freq details. Then we subtract this image from original, and create mask with high freq details, which then is added to the original image to enhance the details/edges.       
 Formula: original + (original - blurred) or original + mask. In addition to this formula we also have something called highboost, which amplifies high freq details the following way: original + k * mask. Depending on k value we can get crispier, more visible details in the image. 
+
+# 3. Chapter 3: Image Segmentation - Edge Detection
+Image segmentation is the process of cutting image into meaningful regions/areas. We have 5 main rules:       
+**Union**: If you add up every single segment (R_1, R_2, ...), you must get the original image back.
+**Connectivity**: Image region has to be one full meaningful thing. Meaning we can not have half of the car in the right side of the image and other half is in the top or something.
+**Disjointness**: Intersaction of regions must be null set. No region has to be part of another region, it is eiter the car or mountain.
+**Similarity**: Each pixel in the region must share some common trait, if this region is red, pixels has to be red, if there is a green that we failed.
+**Dissimilarity**: If we merge two neighboring regions into one they should fail in similarity test. If the sky and ocean are the same, it does not make any sense.
+
+     We divide image into regions using two main approaches:          
+     1. Discontinuity based - where try to find a fast/sudden change in intensity, which means we found a certain border or new object. We use sobel (gradients, laplacian).        
+     2. Similarity based - Groups pixels with similar properties. We can use thresholding.    
+
+     We have different types of edges:
+     1. Step edge, where we have a sudden change, the best case but rarest one. Example:       
+     Intensity: [ 50  50  50 | 200  200  200 ]
+                      ↑
+                  Sharp transition
+     2. Ramp edge - is the case with gradual change. Example:         
+     Intensity: [ 50  50  80  120  160  200  200  200 ]
+                    └─── gradual ───┘
+
+     3. Roof edge - is the case where intensity rises and then it drops. Example:         
+     Intensity: [ 50  50  100  150  100  50  50 ]
+                    └─ peak ─┘
+
+Potential problems when it comes to edge detection. With 1st derivative our edges can become thick, with second derivative we can get double edge, if we do not use zero crossing technique and use tresholding instead, if we have a lot of noise before trying to find any details, derivatives will only amplify those noises. Solution is to Blur the image, using for example Gaussian blur.
+
+
