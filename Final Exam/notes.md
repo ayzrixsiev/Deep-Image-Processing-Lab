@@ -102,20 +102,18 @@ The intensity changes slowly. But deravitive can calculate only the change of tw
 
 ### First-Order Gradient Operators
 
-**Roberts Cross Operator**      
-Gx = [ 1   0 ]                
-     [ 0  -1 ]          
+**Roberts Cross Operator**    
 
-Gy = [ 0   1 ]      
-     [-1   0 ]      
+     Gx = [ 1   0 ]        Gy = [ 0   1 ]      
+          [ 0  -1 ]             [-1   0 ]                      
 
 To detect diagonal edges, very sensitive to noise.       
 
 **Sobel operator**      
 
-Gx = [-1  0  1 ]      Gy = [-1 -2 -1 ]      
-     [-2  0  2 ]           [ 0  0  0 ]      
-     [-1  0  1 ]           [ 1  2  1 ]      
+     Gx = [-1  0  1 ]      Gy = [-1 -2 -1 ]      
+          [-2  0  2 ]           [ 0  0  0 ]      
+          [-1  0  1 ]           [ 1  2  1 ]      
 
 To detect horizontal and vertical edges, has it's own smoothing effect (look at 1, 2, 1). good for noisy images.     
 
@@ -125,23 +123,25 @@ Formula: f''(x) = f(x+1) + f(x-1) - 2×f(x)
 
 This gives us more precise deravitive localization. Because of the concept named: Zero crossing, which means we can find a center of the edge creating a precise location. We use the concept of - and +.
 
-**Laplacian** this is a technique where we extract edges using second deravitive. Here is the example:        
+**Laplacian** this is a technique where we extract edges using second deravitive.
+The normal laplacian kernel looks the following way:        
 
+[1   1    1]                
+[1  -8    1]             
+[1   1    1]                  
+
+Example image with a spike:        
 [ 100  100  100 ]        
 [ 100  150  100 ]  ← Edge pixel         
 [ 100  100  100 ]        
 
-150 is a spike in the image.       
+     Process:       
+     1. Multiply neighbors: 100 * 8 = 800 (get the sum of all neighbors)      
+     2. Multiply center: 150 * (-8) = -1200          
+     3. Sum them up: 800 + (-1200) = -400 (if it is not zero we found a detail)      
 
-Multiply neighbors: 100 * 8 = 800 (get the sum of all neighbors)      
-Multiply center: 150 * (-8) = -1200          
-Sum them up: 800 + (-1200) = -400       
-
-The normal laplacian kernel looks the following way:        
-
-[1 1 1]        
-[1 -8 1]       
-[1 1 1]        
+This is how we can identify details/edges and use this resulted image to enhance original image details.
+**Sharpened image = Original - Laplacian**      
 
 Second deravitive is much sensitive to the noise since it amplifies the noise. For example:
 
@@ -157,3 +157,61 @@ Solution: Smooth Before Sharpening
 Apply Gaussian smoothing to reduce noise          
 Then apply Laplacian or other sharpening          
 This reduces false edge detections      
+
+### Unsharp masking
+This is another process of getting details on the image. First we blur the image using low pass filter (Gaussian blur) and get rid off all sharp details, once that happens we successfully isolate low frequency details. Second step is to subtract this blur from original image, to isolate high frequency details (shapry details), this is called: mask image. Third step is to add this mask to the original image to enhance details.
+
+1. Blur orig image to kill sharp details
+2. Subtract this blur from orig image to isolate sharp details.
+3. Add this mask to orig image to enhace sharp details.
+
+Formula: Sharpened = Orig + Mask
+
+### Highboost filtering
+This is an addition to the unsharp masking. Which can be added to the formula: Sharpened = Orig + **k** + Mask
+It amplifies high freq details. Which then results in a sharper overall image, aka crispier.
+
+**Point detection** we use laplacian to find "spikes" in the images, and when there is a brighter spot we get negative value, while if it is dark we get positive number. But we need to identify whether it is a spot or not regardless of it's color, so we take an absolute value of it. After that we set up a certain threshold, to idetify whether that is really a point or just very tiny unecessary detail.
+
+**Line detection** is where we use different kernels to detect lines in different directions on the image.
+     [ -1  -1  -1 ]      
+     [  2   2   2 ] <- Horizontal detection       
+     [ -1  -1  -1 ]      
+
+     [ -1   2  -1 ]      
+     [ -1   2  -1 ] <- Vertical detection         
+     [ -1   2  -1 ]           
+
+     [  2  -1  -1 ]      
+     [ -1   2  -1 ] <- Diagonal X       
+     [ -1  -1   2 ]      
+
+     [ -1  -1   2 ]      
+     [ -1   2  -1 ] <- Diagonal Y       
+     [  2  -1  -1 ]      
+
+
+# Summary of two chapters
+
+**We have several processes that we can do over the image**           
+**1. Smoothing image, preprocessing**             
+**2. Identifying different types of details**               
+
+## 1. Smoothing images
+We have a concept called spatial filtering. Which means we design a certain kernel and slide it over the image to change pixels values based on our goal and it each pixel's neighbors.
+
+     We have four main smoothing kernel filters: 
+     1. Box filter.      
+     2. Gaussian filter.      
+     3. Median filter.        
+   
+1. ### Box filter is the process of getting average of surrounding pixels and then replacing center with that value to smooth to image. This is good for real time video processing, because we just take an average, speed matters more than quality
+2. ### Gaussian filter is does the same thing by taking average, but it does not treat pixels the same. Pixels (neighbors) that are closer to the center are likely the part of the same object, hence they get a higher weight and in the end better visual results than box filter. This is a solid way to preprocess an image for edge detections.
+3. ### Median filter is where we use different math, we use order statistics, we slide a kernel over the image, usually 3x3 or 5x5, make an array of those images, order them in ascending order find a median and replace center with it. This filter is very good for salt and pepper images, which has big and a lot of spikes/dots on the image (255 or 0).
+
+
+**Key concepts to remember about kernels**
+1. Size matter. If kernel is small, it is going to take a smaller average, which results in smaller changes and keeping more details, while bigger kernel averages more pixels and have a bigger impact, which means image will be more blurred.
+2. Circular symmetry means that we treat all pixels equally regrdless of direction. Box filter does not follow this rule because it is a square which means it stretches more to the edges, while Gaussian does follow the rule because it is more round like kernel.
+3. Padding methods, when we slide a kernel over the image, sometimes kernel goes off the borders, and we need to add some pixels to the image to cover it. We have three main ways of doing it. First one is to add zeroes, good for images that already have black background or need a consistent input size like in CNN model. Second is mirroring pixels, meaning copy the pixels of an image near the border, helps us create more natural reult and good for image editing. Third is replicating, meaning we try to extend the details of the image, if we have a stone near the edge, we make stone bigger by making it wider for example, but this process can cause discontinuities, it can look "stretched", good for e.g medical image where we care exact brightness and details, without new fake patterns that can occur when we use mirror.
+
