@@ -266,7 +266,7 @@ Image segmentation is the process of cutting image into meaningful regions/areas
 
      We divide image into regions using two main approaches:          
      1. Discontinuity based - where try to find a fast/sudden change in intensity, which means we found a certain border or new object. We use sobel (gradients, laplacian).        
-     2. Similarity based - Groups pixels with similar properties. We can use thresholding.    
+     2. Similarity based - groups of pixels with similar properties. We can use e.g thresholding.    
 
      We have different types of edges:
      1. Step edge, where we have a sudden change, the best case but rarest one. Example:       
@@ -283,4 +283,42 @@ Image segmentation is the process of cutting image into meaningful regions/areas
 
 Potential problems when it comes to edge detection. With 1st derivative our edges can become thick, with second derivative we can get double edge, if we do not use zero crossing technique and use tresholding instead, if we have a lot of noise before trying to find any details, derivatives will only amplify those noises. Solution is to Blur the image, using for example Gaussian blur.
 
+### Canny
+This is one of the best edge detectors. It does four main functionalities:      
+1. Gaussian smoothing. Cleanes up an image from noise.
+2. Gradient calculation, it uses sobel kernel and calculates magnitude. It find edges and their derictions.
+3. Making line thinner. It uses a comparison technique, where we take a center pixel and compare it to it's neighbors to check whether it is bigger (if yes keep it) or smaller (if yes make it zero), this way we make an edge one pixel wide.
+4. Hysteresis thresholding. Which means we have two threshold value, high and low. If pixel is bigger than high thr, then it is deffinetly an edge, if it is between low and high then it is maybe an edge (then we check whether thin potential edge is connected to the actual edge, if yes we keep it, if no then no).
+
+# Chapter 4: Image Segmentation - Thresholding
+
+**Threshold** is the process of setting a certain value and then comparing all the pixels against it, if pixels satisfies the condition, we set up a certain new value. We usually use it with grayscale image to convert it to binary image.
+We have different types. 
+
+# Chapter 5: Morphological Image Processing
+
+It is shape-based operations used mostly on grayscale and binary images. It is useful for:          
+Cleaning up binary images          
+Extracting shape features          
+Separating connected objects       
+Filling holes       
+
+We have something called structuring element, which is a matrix of 0s and 1s. This is our main tool we use in morphology. 
+     We have several processes that we use:       
+     1. **Erosion** - it shrinks the foreground/roi. It looks the following way:          
+     [0 1 0]        
+     [1 1 1]        
+     [0 1 0]             
+     We slide this kernel over the image and if this kernel's at least one side does not fit the object's shape, we make the center pixel 0. Only if kernel fits the whole object the center pixel will remain 1.      
+     2. **Dilation** - it extends the image borders, kernel looks the following way:                
+     [0 1 0]        
+     [1 1 1]        
+     [0 1 0]        
+     If at least one side of the kernel touches the object, we add a pixel to it. If we do not touch it, pixels are not added.              
+     3. **Duality** - applying erosion to an image is the same thing as applying delation on the background. So if you want to for example shrink black dote on a white area, you can apply delation on the white area.          
+     4. **Opening** - is basically an implementation of erosion followed by dilation. What we achieve can be found in the following image:                 
+     ![image](../data/images/opening.png)              
+     What we do here is get rid of noise and unecessary edges, and get rids off small gaps between object, then fill up the holes and grows objects back. We can use it to remove snow, salt like noise from images.        
+     5. **Closing** - this is a process for fixing cracks inside object. Imagine we have a white line, but there is a crack in the middle, computer thinks these are two separate lines, to avoid this, we apply delation to grow the lines and it will be enough to close the gap, and then we apply erosian to get the line back to it's original size. We can for example use it to fix broken texts.        
+     **Additional things we can do** if subtract erosed image from original one, we can get boundaries this is called bounadry extraction. Another Connected-Component Analysis (CCA) where we give each separate object unique label: Label 1 car, Label 2 mountain and etc. Hole filling - this is a process where we take a certain image, put white dot inside a new empty image (the dot is placed where mirroring the location in the hole) and then start filling it by using SE. Check the video: [link](https://youtu.be/5DcCI2HCi8k?si=H5Dyby1PnD-YROoy)         
 
