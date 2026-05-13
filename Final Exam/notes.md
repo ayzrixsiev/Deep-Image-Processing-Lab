@@ -191,7 +191,7 @@ It amplifies high freq details. Which then results in a sharper overall image, a
      [  2  -1  -1 ]      
 
 
-# Summary of two chapters
+# Summary
 
 **We have several processes that we can do over the image**           
 **1. Smoothing image, preprocessing**             
@@ -200,7 +200,7 @@ It amplifies high freq details. Which then results in a sharper overall image, a
 ## 1. Smoothing images
 We have a concept called spatial filtering. Which means we design a certain kernel and slide it over the image to change pixels values based on our goal and it each pixel's neighbors.
 
-     We have four main smoothing kernel filters: 
+     We have four main smoothing kernel filters AKA Low pass filters that gets rid off high frequencies by blurring an image: 
      1. Box filter.      
      2. Gaussian filter.      
      3. Median filter.        
@@ -215,3 +215,43 @@ We have a concept called spatial filtering. Which means we design a certain kern
 2. Circular symmetry means that we treat all pixels equally regrdless of direction. Box filter does not follow this rule because it is a square which means it stretches more to the edges, while Gaussian does follow the rule because it is more round like kernel.
 3. Padding methods, when we slide a kernel over the image, sometimes kernel goes off the borders, and we need to add some pixels to the image to cover it. We have three main ways of doing it. First one is to add zeroes, good for images that already have black background or need a consistent input size like in CNN model. Second is mirroring pixels, meaning copy the pixels of an image near the border, helps us create more natural reult and good for image editing. Third is replicating, meaning we try to extend the details of the image, if we have a stone near the edge, we make stone bigger by making it wider for example, but this process can cause discontinuities, it can look "stretched", good for e.g medical image where we care exact brightness and details, without new fake patterns that can occur when we use mirror.
 
+
+## 2. Edge detection, details extraction
+
+     We have three High pass filters for sharpening images, meaning extracting details:
+     1. Sobel.
+     2. Laplacian.
+     3. Unsharp masking + Highboost.
+
+To understand how we extract the details, we first need to grasp the concept of Derivatives. We have two types of them:
+First derivative and second derivative, both measures the rate of intensity change in images.       
+
+**First derivative** is measures the difference between two pixels. It asks a question "How much current pixel's value changed from previous one".          
+Example:       
+[100, 100, 150, 200, 200, 200]          
+[  0,  50,  50,   0,   0,   0]          
+As you can see we identified from which point diff appeared and where exactly that diff happened. But for computer this is not ideal, since it does not know exactly where the edge is, first 50 or second 50, hence it takes both, as a result we have thick lines.
+
+**Second derivative** is a measurement of change of the first deravitive. In our case:              
+[  0,  50,  0,  -50,  0]           
+This is called zero crossing. The point between + and - is the center of the edge.        
+As you can see second der is better when it comes to more accurate edge detection.
+
+
+
+*Sobel* is the representation of the 1st deravitive.  
+
+     Gx = [-1  0  1 ]      Gy = [-1 -2 -1 ]      
+          [-2  0  2 ]           [ 0  0  0 ]      
+          [-1  0  1 ]           [ 1  2  1 ]       
+We are looking for the difference in this non zero parts of the kernel by summing them. Thick lines. We need to apply both direction.
+
+*Laplacian* is the representation of the 2nd deravitive.
+     [1   1    1]                
+     [1  -8    1]             
+     [1   1    1]   
+We are summing all teh neighbor pixels and then subtracting it from the center to see whether there is a diff. We have here cyclic symmetry, because we do not care about direction.
+
+
+*Unsharp masking* is another approach to extract edges and details. First we blur the image (with gaussian) and leave it only with low freq details. Then we subtract this image from original, and create mask with high freq details, which then is added to the original image to enhance the details/edges.       
+Formula: original + (original - blurred) or original + mask. In addition to this formula we also have something called highboost, which amplifies high freq details the following way: original + k * mask. Depending on k value we can get crispier, more visible details in the image. 
